@@ -1,0 +1,4 @@
+redis
+kafka-python
+streamlit
+fastapi[standard]
