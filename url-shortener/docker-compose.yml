@@ -1,0 +1,89 @@
+services:
+  kafka:
+    image: apache/kafka:latest # Or a specific version like 3.7.0
+    hostname: broker
+    container_name: broker
+    ports:
+      - "9092:9092" # Port for external access from the host machine
+      - "9093:9093" # Port for internal Docker network access (optional, but good for clarity)
+    environment:
+      # KRaft mode configuration
+      # KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0  # Speeds up consumer group rebalances for dev
+      # KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      # KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      # KAFKA_PROCESS_ROLES: broker,controller
+      # KAFKA_NODE_ID: 1
+      # KAFKA_LISTENERS: PLAINTEXT://:9092,BROKER://:9093
+      # KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,BROKER://kafka:9093
+      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,BROKER:PLAINTEXT
+      # KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093 # For single node, it votes for itself
+      # KAFKA_CONTROLLER_LISTENER_NAMES: BROKER # Tells Kafka to use the 'BROKER' listener for controller communication
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:29093
+      KAFKA_LISTENERS: PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+
+    volumes:
+      - kafka_data:/var/lib/kafka/data # Persist Kafka data
+    restart: unless-stopped # Automatically restart if it crashes
+
+  # grafana:
+  #   image: grafana/grafana-enterprise
+  #   container_name: grafana
+  #   restart: unless-stopped
+  #   ports:
+  #    - '3000:3000'
+
+  #   volumes:
+  #     - grafana-storage:/var/lib/grafana
+
+  redis:
+    image: redis:8.2-rc1-bookworm # Use the official Redis image from Docker Hub
+    container_name: redis # Assign a memorable name to your container
+    ports:
+      - "6379:6379" # Map the host's port 6379 to the container's port 6379
+    volumes:
+      - redis_data:/data # Persist Redis data in a named volume
+
+  streamlit:
+    build:
+      context: .  # Path to the directory containing the Dockerfile
+      dockerfile: Dockerfile # Optional: specify a different Dockerfile name
+      target: streamlit_app # Optional: target a specific stage in a multi-stage Dockerfile
+    ports:
+      - "8501:8501" # Map the host's port 8501 to the container's port 8501
+    environment:
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_RUN_ON_SAVE=true
+      - STREAMLIT_SERVER_ALLOW_RUN_ON_SAVE=true
+      - STREAMLIT_SERVER_FASTRERUNS=true
+      - STREAMLIT_SERVER_FILEWATCHERTYPE=auto
+    volumes:
+      - ./streamlit_app:/app
+  url_redirect:
+    build:
+        context: .  # Path to the directory containing the Dockerfile
+        dockerfile: Dockerfile # Optional: specify a different Dockerfile name
+        target: url_redirect # Optional: target a specific stage in a multi-stage Dockerfile
+    ports:
+      - "8000:8000" # Map the host's port 8000 to the container's port 8000
+
+volumes:
+  # grafana-storage: {} # Define the named volume for Grafana data persistence
+  redis_data: {} # Define the named volume for data persistence
+  kafka_data: {} # Define the named volume for Kafka data persistence
+  # streamlit_app: {} # Define the named volume for Streamlit app data persistence
+
