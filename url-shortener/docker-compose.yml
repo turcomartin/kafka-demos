@@ -60,8 +60,6 @@ services:
       - "8000:8000" # Map the host's port 8000 to the container's port 8000
 
 volumes:
-  # grafana-storage: {} # Define the named volume for Grafana data persistence
   redis_data: {} # Define the named volume for data persistence
   kafka_data: {} # Define the named volume for Kafka data persistence
-  # streamlit_app: {} # Define the named volume for Streamlit app data persistence
 
