@@ -7,18 +7,6 @@ services:
       - "9092:9092" # Port for external access from the host machine
       - "9093:9093" # Port for internal Docker network access (optional, but good for clarity)
     environment:
-      # KRaft mode configuration
-      # KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      # KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0  # Speeds up consumer group rebalances for dev
-      # KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      # KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      # KAFKA_PROCESS_ROLES: broker,controller
-      # KAFKA_NODE_ID: 1
-      # KAFKA_LISTENERS: PLAINTEXT://:9092,BROKER://:9093
-      # KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,BROKER://kafka:9093
-      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,BROKER:PLAINTEXT
-      # KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093 # For single node, it votes for itself
-      # KAFKA_CONTROLLER_LISTENER_NAMES: BROKER # Tells Kafka to use the 'BROKER' listener for controller communication
       KAFKA_BROKER_ID: 1
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
@@ -39,16 +27,6 @@ services:
     volumes:
       - kafka_data:/var/lib/kafka/data # Persist Kafka data
     restart: unless-stopped # Automatically restart if it crashes
-
-  # grafana:
-  #   image: grafana/grafana-enterprise
-  #   container_name: grafana
-  #   restart: unless-stopped
-  #   ports:
-  #    - '3000:3000'
-
-  #   volumes:
-  #     - grafana-storage:/var/lib/grafana
 
   redis:
     image: redis:8.2-rc1-bookworm # Use the official Redis image from Docker Hub
