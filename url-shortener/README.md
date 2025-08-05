@@ -1,22 +1,31 @@
-# URL Shortener
+# Redis event tracking with Kakfa
 
-In this tutorial we are going to build a completely serverless URL Shortener with real time monitoring and observability.
+This is a toy project to see how we can combine kafka, redis and Streamlit. The simplistic approach ensures you can get familiar with the tools, experiment and get ready to explore these technologies more in-depth
 
-![Architechture of the URL shortener](url-shortener.png)
+## What are we building?
 
-## Our shopping cart 🛒
+We are building a Streamlit interface to insert key-value pairs of data into a Redis database. Each entry will also send a message to a Kakfa broker.
+This will allow any other service listening to these messages take action if needed.
 
-- We got a **Redis DB** to store the short-urls and original urls.
-- A **Kafka** server that will store incoming click events
-- A **Cloudflare** worker that will host our URL Shortener
-- A **Grafana** cloud service we can connect to Kafka and create some nice visualizations.
+## Our components
 
-## Redis
-
-We head up to [upstash.com](upstash.com) and create a new account.
-
-Head to the Redis section and boot up a new Redis instance.
-
-Let's name **url-shortener-redis**.
+- Streamlit
+- Docker
+- Kafka
+- Redis
+- FastAPI (Optional)
 
 ## Kafka
+
+[Kafka](https://kafka.apache.org/documentation/) is a message broker that is based on the concept of topic. Think of the topic a way to categorize messages so you only pay attention to what you are interested in.
+It receives messages from producers, stores them, and serves them to consumers upon request
+
+## Streamlit
+
+[Streamlit](https://streamlit.io) is an open-source Python framework for engineers to deliver interactive data apps – in only a few lines of code.
+
+Stramlit will be our interface with Redis and will allow us to see the messages published to Kafka
+
+## Docker Containers
+
+[Docker](https://www.docker.com/) packages software into standardized units called containers that have everything the software needs to run including libraries, system tools, code, and runtime.
